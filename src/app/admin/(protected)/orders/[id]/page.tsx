@@ -54,6 +54,16 @@ export default async function AdminOrderDetail({ params }: { params: Params }) {
         <OrderStatusSelect id={order.id} status={order.status} />
       </div>
 
+      {order.status === "awaiting_payment" && (
+        <div className="mt-5 rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-ink">
+          <strong>Payment approval pending.</strong> This order is paid by{" "}
+          {paymentLabel(order.payment_method)}. The customer should send a payment
+          screenshot with their name (should match{" "}
+          <strong>{order.customer_name}</strong>) on WhatsApp. Once you&apos;ve
+          verified it, set the status to <strong>Confirmed</strong>.
+        </div>
+      )}
+
       <div className="mt-6 grid gap-6 md:grid-cols-[1fr_320px]">
         {/* Items + totals */}
         <div className="card overflow-hidden">

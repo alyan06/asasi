@@ -45,6 +45,7 @@ export type DiscountValidation = {
 };
 
 export type OrderStatus =
+  | "awaiting_payment"
   | "pending"
   | "confirmed"
   | "packed"
@@ -103,4 +104,5 @@ export type PlacedOrder = {
   discount_amount: number;
   delivery_fee: number;
   total: number;
+  status: OrderStatus;
 };

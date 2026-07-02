@@ -82,7 +82,7 @@ create table if not exists public.orders (
   payment_method   text not null default 'cod' check (payment_method in ('cod','online','bank_transfer')),
   order_notes      text,
   status           text not null default 'pending'
-                     check (status in ('pending','confirmed','packed','shipped','delivered','cancelled')),
+                     check (status in ('awaiting_payment','pending','confirmed','packed','shipped','delivered','cancelled')),
   created_at       timestamptz not null default now()
 );
 create index if not exists orders_status_idx  on public.orders (status);

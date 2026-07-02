@@ -67,6 +67,10 @@ export default function CheckoutPage() {
       setError("Please fill in your name, phone number and shipping address.");
       return;
     }
+    if (form.phone.replace(/\D/g, "").length !== 11) {
+      setError("Enter a valid 11-digit phone number (e.g. 03001234567).");
+      return;
+    }
     if (lines.length === 0) {
       setError("Your cart is empty.");
       return;
@@ -168,11 +172,14 @@ export default function CheckoutPage() {
                 <input
                   className="input"
                   value={form.phone}
-                  onChange={(e) => set("phone", e.target.value)}
-                  placeholder="03xx xxxxxxx"
-                  inputMode="tel"
+                  onChange={(e) =>
+                    set("phone", e.target.value.replace(/\D/g, "").slice(0, 11))
+                  }
+                  placeholder="03001234567"
+                  inputMode="numeric"
                   autoComplete="tel"
                 />
+                <p className="mt-1 text-xs text-muted">11 digits, e.g. 03001234567</p>
               </div>
               <div>
                 <label className="label">Email (optional)</label>
@@ -235,6 +242,15 @@ export default function CheckoutPage() {
                 </label>
               ))}
             </div>
+
+            {(form.payment === "online" || form.payment === "bank_transfer") && (
+              <div className="mt-4 rounded-xl border border-clay/30 bg-clay/10 px-4 py-3 text-sm text-ink/80">
+                After you place the order we&apos;ll show our account details. Transfer
+                the total, then send a <strong>screenshot of the payment along with
+                your name</strong> (same as above) on WhatsApp. We confirm and dispatch
+                once it&apos;s received.
+              </div>
+            )}
           </section>
 
           <section className="card p-6">

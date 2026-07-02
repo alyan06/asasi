@@ -17,6 +17,23 @@ function slugify(s: string): string {
     .replace(/^-+|-+$/g, "");
 }
 
+/** Build a URL slug from the name that isn't already taken by another product. */
+async function makeUniqueSlug(
+  supabase: ReturnType<typeof createClient>,
+  base: string,
+): Promise<string> {
+  const safe = base || "product";
+  const { data } = await supabase
+    .from("products")
+    .select("slug")
+    .ilike("slug", `${safe}%`);
+  const taken = new Set((data ?? []).map((r: { slug: string }) => r.slug));
+  if (!taken.has(safe)) return safe;
+  let n = 2;
+  while (taken.has(`${safe}-${n}`)) n++;
+  return `${safe}-${n}`;
+}
+
 export function ProductForm({
   product,
   categories,
@@ -29,8 +46,6 @@ export function ProductForm({
   const isEdit = !!product;
 
   const [name, setName] = useState(product?.name ?? "");
-  const [slug, setSlug] = useState(product?.slug ?? "");
-  const [slugTouched, setSlugTouched] = useState(isEdit);
   const [description, setDescription] = useState(product?.description ?? "");
   const [price, setPrice] = useState(product ? String(product.price) : "");
   const [salePrice, setSalePrice] = useState(
@@ -50,11 +65,6 @@ export function ProductForm({
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-
-  function onNameChange(v: string) {
-    setName(v);
-    if (!slugTouched) setSlug(slugify(v));
-  }
 
   function toggleSkin(t: string) {
     setSkinTypes((prev) =>
@@ -96,8 +106,8 @@ export function ProductForm({
     e.preventDefault();
     setError("");
 
-    if (!name.trim() || !slug.trim() || !category.trim() || !price) {
-      setError("Name, slug, category and price are required.");
+    if (!name.trim() || !category.trim() || !price) {
+      setError("Name, category and price are required.");
       return;
     }
     const priceNum = Number(price);
@@ -108,9 +118,13 @@ export function ProductForm({
     }
 
     setSaving(true);
+    // URL slug is derived from the name automatically (kept stable on edit).
+    const slug = isEdit
+      ? product!.slug
+      : await makeUniqueSlug(supabase, slugify(name));
     const payload = {
       name: name.trim(),
-      slug: slugify(slug),
+      slug,
       description: description.trim(),
       price: priceNum,
       sale_price: saleNum,
@@ -142,7 +156,7 @@ export function ProductForm({
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "";
       if (message.includes("duplicate") || message.includes("unique")) {
-        setError("That slug is already in use. Choose a different one.");
+        setError("A product with a very similar name exists — tweak the name slightly.");
       } else {
         setError("Could not save the product. Please try again.");
       }
@@ -161,22 +175,8 @@ export function ProductForm({
               <input
                 className="input"
                 value={name}
-                onChange={(e) => onNameChange(e.target.value)}
+                onChange={(e) => setName(e.target.value)}
               />
-            </div>
-            <div>
-              <label className="label">Slug (URL) *</label>
-              <input
-                className="input"
-                value={slug}
-                onChange={(e) => {
-                  setSlug(e.target.value);
-                  setSlugTouched(true);
-                }}
-              />
-              <p className="mt-1 text-xs text-muted">
-                /product/{slug || "your-product"}
-              </p>
             </div>
             <div>
               <label className="label">Description</label>

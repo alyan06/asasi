@@ -22,16 +22,20 @@ export const PAYMENT_METHODS = [
   {
     value: "bank_transfer",
     label: "Bank Transfer",
-    hint: "We'll share account details and confirm once received.",
+    hint: "Transfer to our account, then send the payment screenshot on WhatsApp.",
   },
   {
     value: "online",
-    label: "Online Payment",
-    hint: "Pay online — our team will send a secure link.",
+    label: "Online Payment (JazzCash / Easypaisa)",
+    hint: "Pay to our wallet, then send the payment screenshot on WhatsApp.",
   },
 ] as const;
 
+/** Methods that require the customer to send proof and admin to approve. */
+export const PROOF_METHODS = ["online", "bank_transfer"] as const;
+
 export const ORDER_STATUSES = [
+  "awaiting_payment",
   "pending",
   "confirmed",
   "packed",
@@ -39,6 +43,23 @@ export const ORDER_STATUSES = [
   "delivered",
   "cancelled",
 ] as const;
+
+/**
+ * Bank / wallet details shown to customers paying by bank transfer or online.
+ * TODO(owner): replace these placeholders with the real account details.
+ */
+export const BANK_DETAILS = {
+  bankName: "Meezan Bank",
+  accountTitle: "Asasi Organics",
+  accountNumber: "0000 0000 0000 00",
+  iban: "PK00 MEZN 0000 0000 0000 0000",
+  jazzcash: "0300 1234567",
+  easypaisa: "0300 1234567",
+};
+
+/** WhatsApp number to which customers send their payment screenshot. */
+export const PAYMENT_WHATSAPP = BRAND.whatsapp;
+export const PAYMENT_WHATSAPP_DISPLAY = BRAND.whatsappDisplay;
 
 /** WhatsApp deep link with an optional pre-filled message. */
 export function whatsappLink(message?: string): string {

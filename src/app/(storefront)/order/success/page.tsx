@@ -5,7 +5,13 @@ import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useState } from "react";
 import { CheckCircle2, MessageCircle, Package, ArrowRight } from "lucide-react";
 import { money } from "@/lib/format";
-import { BRAND, PAYMENT_METHODS, whatsappLink } from "@/lib/config";
+import {
+  BRAND,
+  PAYMENT_METHODS,
+  BANK_DETAILS,
+  PAYMENT_WHATSAPP_DISPLAY,
+  whatsappLink,
+} from "@/lib/config";
 
 type Receipt = {
   order_number: string;
@@ -41,9 +47,15 @@ function SuccessView() {
     }
   }, [orderNumber]);
 
-  const waMessage = `Hi ${BRAND.name}! I just placed order ${
-    orderNumber || receipt?.order_number || ""
-  }. I'd like to confirm my order, thank you!`;
+  const needsProof =
+    receipt?.payment_method === "online" ||
+    receipt?.payment_method === "bank_transfer";
+
+  const num = orderNumber || receipt?.order_number || "";
+  const waMessage = `Hi ${BRAND.name}! I just placed order ${num}. I'd like to confirm my order, thank you!`;
+  const payMessage = `Hi ${BRAND.name}! Sending payment proof for order ${num}. My name is ${
+    receipt?.customer_name ?? ""
+  } (same as on the order).`;
 
   return (
     <div className="container-x py-14 md:py-20">
@@ -55,8 +67,9 @@ function SuccessView() {
           Thank you{receipt?.customer_name ? `, ${receipt.customer_name}` : ""}!
         </h1>
         <p className="mt-3 text-muted">
-          Your order has been placed. We&apos;ll confirm it shortly and send it
-          your way via {BRAND.courier}.
+          {needsProof
+            ? `Your order is reserved. Complete the payment below and send us the proof to confirm — then we'll ship via ${BRAND.courier}.`
+            : `Your order has been placed. We'll confirm it shortly and send it your way via ${BRAND.courier}.`}
         </p>
 
         <div className="mt-6 inline-flex flex-col items-center rounded-2xl border border-line bg-paper px-8 py-5">
@@ -68,6 +81,56 @@ function SuccessView() {
           </span>
         </div>
       </div>
+
+      {receipt && needsProof && (
+        <div className="mx-auto mt-8 max-w-xl">
+          <div className="card border-clay/40 p-6">
+            <h2 className="font-display text-xl text-ink">Complete your payment</h2>
+            <p className="mt-1 text-sm text-muted">
+              Transfer <strong className="text-ink">{money(receipt.total)}</strong>{" "}
+              using the details below.
+            </p>
+
+            <dl className="mt-4 divide-y divide-line rounded-xl border border-line">
+              {[
+                ["Bank", BANK_DETAILS.bankName],
+                ["Account title", BANK_DETAILS.accountTitle],
+                ["Account number", BANK_DETAILS.accountNumber],
+                ["IBAN", BANK_DETAILS.iban],
+                ["JazzCash / Easypaisa", BANK_DETAILS.jazzcash],
+              ].map(([label, value]) => (
+                <div
+                  key={label}
+                  className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm"
+                >
+                  <dt className="text-muted">{label}</dt>
+                  <dd className="font-medium text-ink">{value}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <div className="mt-4 rounded-xl bg-cream-deep px-4 py-3 text-sm text-ink/80">
+              Send the payment screenshot{" "}
+              <strong>
+                with your name
+                {receipt.customer_name ? ` (${receipt.customer_name})` : ""} — it
+                must match your order
+              </strong>{" "}
+              to WhatsApp {PAYMENT_WHATSAPP_DISPLAY}. We confirm and dispatch once
+              received.
+            </div>
+
+            <a
+              href={whatsappLink(payMessage)}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-clay mt-4 w-full"
+            >
+              <MessageCircle className="h-4 w-4" /> Send payment proof on WhatsApp
+            </a>
+          </div>
+        </div>
+      )}
 
       {receipt && (
         <div className="mx-auto mt-10 max-w-xl">
@@ -128,14 +191,16 @@ function SuccessView() {
       )}
 
       <div className="mx-auto mt-8 flex max-w-xl flex-col gap-3 sm:flex-row sm:justify-center">
-        <a
-          href={whatsappLink(waMessage)}
-          target="_blank"
-          rel="noreferrer"
-          className="btn-clay"
-        >
-          <MessageCircle className="h-4 w-4" /> Confirm on WhatsApp
-        </a>
+        {!needsProof && (
+          <a
+            href={whatsappLink(waMessage)}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-clay"
+          >
+            <MessageCircle className="h-4 w-4" /> Confirm on WhatsApp
+          </a>
+        )}
         <Link href="/shop" className="btn-outline">
           Continue shopping <ArrowRight className="h-4 w-4" />
         </Link>

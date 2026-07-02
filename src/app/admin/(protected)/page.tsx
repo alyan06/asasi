@@ -45,6 +45,20 @@ export default async function AdminDashboard() {
         ))}
       </div>
 
+      {stats.awaiting > 0 && (
+        <Link
+          href="/admin/orders?status=awaiting_payment"
+          className="mt-5 flex items-center gap-3 rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-ink transition-colors hover:bg-gold/15"
+        >
+          <Clock className="h-4 w-4 shrink-0 text-gold" />
+          <span>
+            <strong>{stats.awaiting}</strong> order
+            {stats.awaiting > 1 ? "s" : ""} awaiting payment approval — review the
+            proof and confirm →
+          </span>
+        </Link>
+      )}
+
       {stats.lowStockCount > 0 && (
         <Link
           href="/admin/products"

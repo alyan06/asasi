@@ -19,14 +19,16 @@ export async function getAdminStats() {
 
   const list = orders ?? [];
   const revenue = list
-    .filter((o) => o.status !== "cancelled")
+    .filter((o) => o.status !== "cancelled" && o.status !== "awaiting_payment")
     .reduce((sum, o) => sum + Number(o.total), 0);
   const pending = list.filter((o) => o.status === "pending").length;
+  const awaiting = list.filter((o) => o.status === "awaiting_payment").length;
 
   return {
     orderCount: list.length,
     revenue,
     pending,
+    awaiting,
     productCount: productCount ?? 0,
     lowStockCount: lowStock?.length ?? 0,
   };

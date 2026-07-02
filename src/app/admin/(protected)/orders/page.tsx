@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { getOrders } from "@/lib/admin-queries";
-import { money, formatDate } from "@/lib/format";
+import { money, formatDate, statusLabel } from "@/lib/format";
 import { OrderStatusSelect } from "@/components/admin/order-status-select";
 
 export const metadata = { title: "Orders" };
 
 const TABS = [
   "all",
+  "awaiting_payment",
   "pending",
   "confirmed",
   "packed",
@@ -36,20 +37,20 @@ export default async function AdminOrdersPage({
           <Link
             key={t}
             href={t === "all" ? "/admin/orders" : `/admin/orders?status=${t}`}
-            className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium capitalize transition-colors ${
+            className={`shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
               status === t
                 ? "bg-forest text-cream"
                 : "border border-line bg-paper text-ink hover:border-forest"
             }`}
           >
-            {t}
+            {t === "all" ? "All" : statusLabel(t)}
           </Link>
         ))}
       </div>
 
       {orders.length === 0 ? (
         <div className="card px-6 py-16 text-center text-muted">
-          No {status !== "all" ? status : ""} orders to show.
+          No {status !== "all" ? `"${statusLabel(status)}"` : ""} orders to show.
         </div>
       ) : (
         <div className="card overflow-hidden">

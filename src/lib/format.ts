@@ -48,6 +48,20 @@ export function categoryLabel(key: string): string {
   );
 }
 
+const STATUS_LABELS: Record<string, string> = {
+  awaiting_payment: "Awaiting approval",
+  pending: "Pending",
+  confirmed: "Confirmed",
+  packed: "Packed",
+  shipped: "Shipped",
+  delivered: "Delivered",
+  cancelled: "Cancelled",
+};
+
+export function statusLabel(status: string): string {
+  return STATUS_LABELS[status] ?? status;
+}
+
 export function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString("en-PK", {
     day: "numeric",
