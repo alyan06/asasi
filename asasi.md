@@ -71,7 +71,8 @@ migrations `001_core_schema` … `005_tighten_storage_listing`.
 ### Data model
 `products`, `discount_codes`, `orders`, `order_items`, `admin_users`,
 `store_settings` (single row: `delivery_fee` = 250, `free_shipping_threshold` = 5000).
-Order statuses: `pending → confirmed → packed → shipped → delivered` (+ `cancelled`).
+Order statuses: `awaiting_payment` (online/bank orders, needs admin approval) →
+`pending` (COD default) → `confirmed → packed → shipped → delivered` (+ `cancelled`).
 Storage bucket `product-images` (public read via CDN, admin-only writes).
 
 ### Seeded data
@@ -109,7 +110,19 @@ db/schema.sql                       # full reproducible backend
 ```
 
 Brand config (WhatsApp number, Instagram, email, tagline) is in `src/lib/config.ts`
-— **these are placeholders**, update with the real ones.
+— **these are placeholders**, update with the real ones. **`BANK_DETAILS` and
+`PAYMENT_WHATSAPP` in that file are also placeholders** — the bank/wallet account
+number, IBAN and JazzCash/Easypaisa shown to customers paying online must be
+replaced with the real ones before taking real payments.
+
+### Payment flow (online / bank transfer)
+COD orders go straight to `pending`. Orders paid by **Online** or **Bank Transfer**
+are created as **`awaiting_payment`**: the order-success page shows the bank/wallet
+details and asks the customer to send a **payment screenshot together with their
+name (matching the order)** to the WhatsApp number. In the admin these appear under
+the **Orders → "Awaiting approval"** tab (also flagged on the dashboard); the owner
+verifies the proof on WhatsApp, then sets the status to **Confirmed** to fulfil.
+Unconfirmed `awaiting_payment` orders are excluded from the revenue stat.
 
 ---
 
@@ -143,9 +156,10 @@ Brand config (WhatsApp number, Instagram, email, tagline) is in `src/lib/config.
      can be created (admin is already allow-list-gated, this is belt-and-braces).
    - Enable **leaked-password protection** (flagged by the security advisor).
    - **Change the admin password** from the default.
-4. **Payments** — `online` / `bank_transfer` are currently manual (order is saved,
-   owner confirms via WhatsApp). Integrate a PK gateway (Safepay / JazzCash /
-   Easypaisa) or put real bank-transfer details into the checkout copy.
+4. **Payments** — the manual proof-of-payment flow is built (see "Payment flow"
+   above). **Must do:** put the real `BANK_DETAILS` / `PAYMENT_WHATSAPP` in
+   `src/lib/config.ts`. Optional: integrate an automated PK gateway (Safepay /
+   JazzCash / Easypaisa) later to skip manual approval.
 5. **Delivery settings UI** — `store_settings` (fee 250, free-ship 5000) has no
    admin screen yet; edit in Supabase or build a small settings page.
 6. **Custom domain** — add `asasi.pk` (or chosen domain) in Vercel → Domains, and
