@@ -41,7 +41,7 @@ yarn-error.log*
 next-env.d.ts
 
 # local dev artifacts
-/dev.log
+/dev*.log
 /.shots/
 
 # local-only secrets / notes (never commit — repo is public)

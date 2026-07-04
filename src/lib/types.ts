@@ -85,6 +85,18 @@ export type Order = {
   order_items?: OrderItem[];
 };
 
+/** The single row of public.store_settings (snake_case, as stored). */
+export type StoreSettingsRow = {
+  id: number;
+  delivery_fee: number;
+  free_shipping_threshold: number;
+  announcement: string;
+  announcement_enabled: boolean;
+  store_open: boolean;
+  closed_message: string;
+  updated_at: string;
+};
+
 /** A line in the shopper's local cart. Prices are recomputed server-side at checkout. */
 export type CartLine = {
   product_id: string;

@@ -13,6 +13,12 @@ export const BRAND = {
   established: "Handmade in small batches",
 } as const;
 
+/** Default storefront copy — single source of truth (used by settings fallbacks). */
+export const DEFAULT_ANNOUNCEMENT =
+  "Handmade organic skincare · Free delivery over Rs 5,000 · Cash on Delivery across Pakistan";
+export const DEFAULT_CLOSED_MESSAGE =
+  "We are currently closed for orders and will be back very soon. Thank you for your patience!";
+
 export const PAYMENT_METHODS = [
   {
     value: "cod",

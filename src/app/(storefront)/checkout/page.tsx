@@ -63,6 +63,10 @@ export default function CheckoutPage() {
     e.preventDefault();
     setError("");
 
+    if (!settings.storeOpen) {
+      setError("The store is currently closed for orders. Please check back soon.");
+      return;
+    }
     if (!form.name.trim() || !form.phone.trim() || !form.address.trim()) {
       setError("Please fill in your name, phone number and shipping address.");
       return;
@@ -335,12 +339,22 @@ export default function CheckoutPage() {
               </p>
             )}
 
+            {!settings.storeOpen && (
+              <p className="mt-4 rounded-lg border border-clay/40 bg-clay/10 px-3 py-2.5 text-sm text-clay">
+                {settings.closedMessage}
+              </p>
+            )}
+
             <button
               type="submit"
-              disabled={submitting}
+              disabled={submitting || !settings.storeOpen}
               className="btn-primary mt-5 w-full"
             >
-              {submitting ? "Placing order…" : "Place order"}
+              {!settings.storeOpen
+                ? "Store closed"
+                : submitting
+                  ? "Placing order…"
+                  : "Place order"}
             </button>
             <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted">
               <Lock className="h-3 w-3" /> Your details are kept private &

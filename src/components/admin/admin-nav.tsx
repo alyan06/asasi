@@ -7,6 +7,7 @@ import {
   Package,
   ClipboardList,
   Tag,
+  Settings,
 } from "lucide-react";
 
 const LINKS = [
@@ -14,6 +15,7 @@ const LINKS = [
   { href: "/admin/products", label: "Products", icon: Package, exact: false },
   { href: "/admin/orders", label: "Orders", icon: ClipboardList, exact: false },
   { href: "/admin/discounts", label: "Discounts", icon: Tag, exact: false },
+  { href: "/admin/settings", label: "Settings", icon: Settings, exact: false },
 ];
 
 export function AdminNav({ horizontal = false }: { horizontal?: boolean }) {

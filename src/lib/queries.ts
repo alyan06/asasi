@@ -1,5 +1,34 @@
 import { createClient } from "@/lib/supabase/server";
-import type { Product } from "@/lib/types";
+import { DEFAULT_ANNOUNCEMENT, DEFAULT_CLOSED_MESSAGE } from "@/lib/config";
+import type { Product, StoreSettingsRow } from "@/lib/types";
+
+const DEFAULT_STORE_SETTINGS: StoreSettingsRow = {
+  id: 1,
+  delivery_fee: 250,
+  free_shipping_threshold: 5000,
+  announcement: DEFAULT_ANNOUNCEMENT,
+  announcement_enabled: true,
+  store_open: true,
+  closed_message: DEFAULT_CLOSED_MESSAGE,
+  updated_at: new Date().toISOString(),
+};
+
+/** Store settings row (public read). Numbers are coerced from Postgres numerics. */
+export async function getStoreSettings(): Promise<StoreSettingsRow> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("store_settings")
+    .select("*")
+    .eq("id", 1)
+    .maybeSingle();
+  if (!data) return DEFAULT_STORE_SETTINGS;
+  return {
+    ...DEFAULT_STORE_SETTINGS,
+    ...data,
+    delivery_fee: Number(data.delivery_fee),
+    free_shipping_threshold: Number(data.free_shipping_threshold),
+  };
+}
 
 export type ShopFilters = {
   category?: string;

@@ -14,7 +14,17 @@ const NAV = [
   { href: "/#promise", label: "Our Promise" },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({
+  announcement,
+  announcementEnabled,
+  storeOpen,
+  closedMessage,
+}: {
+  announcement: string;
+  announcementEnabled: boolean;
+  storeOpen: boolean;
+  closedMessage: string;
+}) {
   const { count, hydrated } = useCart();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -25,12 +35,18 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50">
-      <div className="bg-forest text-center text-xs font-medium tracking-wide text-cream/90">
-        <p className="px-4 py-2">
-          Handmade organic skincare · Free delivery over Rs 5,000 · Cash on
-          Delivery across Pakistan
-        </p>
-      </div>
+      {!storeOpen ? (
+        <div className="bg-clay text-center text-xs font-semibold tracking-wide text-paper">
+          <p className="px-4 py-2">{closedMessage}</p>
+        </div>
+      ) : (
+        announcementEnabled &&
+        announcement.trim() && (
+          <div className="bg-forest text-center text-xs font-medium tracking-wide text-cream/90">
+            <p className="px-4 py-2">{announcement}</p>
+          </div>
+        )
+      )}
 
       <div className="border-b border-line bg-cream/85 backdrop-blur-md">
         <div className="container-x flex h-16 items-center justify-between">

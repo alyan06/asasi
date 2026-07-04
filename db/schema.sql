@@ -112,6 +112,10 @@ create table if not exists public.store_settings (
   id                      integer primary key default 1 check (id = 1),
   delivery_fee            numeric(12,2) not null default 250,
   free_shipping_threshold numeric(12,2) not null default 5000,
+  announcement            text not null default 'Handmade organic skincare · Free delivery over Rs 5,000 · Cash on Delivery across Pakistan',
+  announcement_enabled    boolean not null default true,
+  store_open              boolean not null default true,     -- holiday mode: false disables checkout
+  closed_message          text not null default 'We are currently closed for orders and will be back very soon. Thank you for your patience!',
   updated_at              timestamptz not null default now()
 );
 insert into public.store_settings (id) values (1) on conflict do nothing;
