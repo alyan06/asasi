@@ -141,6 +141,11 @@ Unconfirmed `awaiting_payment` orders are excluded from the revenue stat.
 - ✅ Server-authoritative orders/discounts/stock.
 - ✅ Secured admin: dashboard stats, product CRUD **with image upload to Storage**,
   order management (inline status + detail + WhatsApp-customer), discount manager.
+- ✅ Admin **Settings** page (`/admin/settings`): edit the announcement bar,
+  toggle the store open/closed (holiday mode, with custom closed message), and set
+  the delivery fee + free-delivery threshold — with a live preview. These drive the
+  storefront instantly; a closed store disables checkout and `place_order()` refuses
+  orders server-side.
 - ✅ Mobile responsive, SEO metadata, PKR, COD + online + bank-transfer options.
 - ✅ Deployed to Vercel + pushed to GitHub.
 
@@ -160,8 +165,8 @@ Unconfirmed `awaiting_payment` orders are excluded from the revenue stat.
    above). **Must do:** put the real `BANK_DETAILS` / `PAYMENT_WHATSAPP` in
    `src/lib/config.ts`. Optional: integrate an automated PK gateway (Safepay /
    JazzCash / Easypaisa) later to skip manual approval.
-5. **Delivery settings UI** — `store_settings` (fee 250, free-ship 5000) has no
-   admin screen yet; edit in Supabase or build a small settings page.
+5. ~~Delivery settings UI~~ — **done.** Delivery fee, free-delivery threshold,
+   announcement bar and holiday mode are all editable in `/admin/settings`.
 6. **Custom domain** — add `asasi.pk` (or chosen domain) in Vercel → Domains, and
    update `metadataBase` in `src/app/layout.tsx`.
 7. **Order notifications** — automate a confirmation to the customer
